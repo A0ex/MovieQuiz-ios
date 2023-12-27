@@ -2,9 +2,19 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController {
     // MARK: - Lifecycle
+
+
+    @IBOutlet weak var knopka: UIButton!
+    @IBOutlet weak var yesButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
-    }
+        yesButton.titleLabel?.font = UIFont(name: "YSDisplay-Medium", size: 24)
+        knopka.titleLabel?.font = UIFont(name: "YSDisplay-Medium", size: 24)
+//        for family in UIFont.familyNames.sorted() {
+//            let names = UIFont.fontNames(forFamilyName: family)
+//            print("Family: \(family) Font names: \(names)")
+//        }
+     }
 }
 
 /*
