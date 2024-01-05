@@ -2,11 +2,125 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController {
     // MARK: - Lifecycle
+    
+    struct ViewModel {
+      let image: UIImage
+      let question: String
+      let questionNumber: String
+    }
+    
+    // для состояния "Вопрос показан"
+    struct QuizStepViewModel {
+      let image: UIImage
+      let question: String
+      let questionNumber: String
+    }
 
-
+    // для состояния "Результат квиза"
+    struct QuizResultsViewModel {
+      let title: String
+      let text: String
+      let buttonText: String
+    }
+    
+    struct QuizQuestion {
+        // строка с названием фильма,
+        // совпадает с названием картинки афиши фильма в Assets
+        let image: String
+        // строка с вопросом о рейтинге фильма
+        let text: String
+        // булевое значение (true, false), правильный ответ на вопрос
+        let correctAnswer: Bool
+    }
+    
+    
+    private var currentQuestionIndex = 0
+    private var correctAnswers = 0
+    
+    private let questions: [QuizQuestion] = [
+            QuizQuestion(
+                image: "The Godfather",
+                text: "Рейтинг этого фильма больше чем 6?",
+                correctAnswer: true),
+            QuizQuestion(
+                image: "The Dark Knight",
+                text: "Рейтинг этого фильма больше чем 6?",
+                correctAnswer: true),
+            QuizQuestion(
+                image: "Kill Bill",
+                text: "Рейтинг этого фильма больше чем 6?",
+                correctAnswer: true),
+            QuizQuestion(
+                image: "The Avengers",
+                text: "Рейтинг этого фильма больше чем 6?",
+                correctAnswer: true),
+            QuizQuestion(
+                image: "Deadpool",
+                text: "Рейтинг этого фильма больше чем 6?",
+                correctAnswer: true),
+            QuizQuestion(
+                image: "The Green Knight",
+                text: "Рейтинг этого фильма больше чем 6?",
+                correctAnswer: true),
+            QuizQuestion(
+                image: "Old",
+                text: "Рейтинг этого фильма больше чем 6?",
+                correctAnswer: false),
+            QuizQuestion(
+                image: "The Ice Age Adventures of Buck Wild",
+                text: "Рейтинг этого фильма больше чем 6?",
+                correctAnswer: false),
+            QuizQuestion(
+                image: "Tesla",
+                text: "Рейтинг этого фильма больше чем 6?",
+                correctAnswer: false),
+            QuizQuestion(
+                image: "Vivarium",
+                text: "Рейтинг этого фильма больше чем 6?",
+                correctAnswer: false)
+        ]
+    
+    @IBOutlet private var imageView: UIImageView!
+    @IBOutlet private var textLabel: UILabel!
+    @IBOutlet private var counterLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        let currentQuestion = questions[currentQuestionIndex]
+        show(quiz: convert(model: currentQuestion))
      }
+    
+    private func convert(model: QuizQuestion) -> QuizStepViewModel {
+        let viewModel = QuizStepViewModel(image: UIImage(named: model.image) ?? UIImage(), question: model.text, questionNumber: "\(currentQuestionIndex + 1)/\(questions.count)")
+        return viewModel
+    }
+    
+    // приватный метод, который меняет цвет рамки
+    // принимает на вход булевое значение и ничего не возвращает
+    private func showAnswerResult(isCorrect: Bool) {
+       // метод красит рамку
+        imageView.layer.masksToBounds = true // даём разрешение на рисование рамки
+        imageView.layer.borderWidth = 1 // толщина рамки
+        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor // делаем рамку белой
+        imageView.layer.cornerRadius = 6 // радиус скругления углов рамки
+    }
+    
+    private func show(quiz step: QuizStepViewModel) {
+        imageView.image = step.image
+        textLabel.text = step.question
+        counterLabel.text = step.questionNumber
+    }
+    
+    @IBAction private func yesButtonClicked(_ sender: UIButton) {
+        showAnswerResult(isCorrect: questions[currentQuestionIndex].correctAnswer == true)
+        imageView.layer.borderColor = UIColor.ypGreen.cgColor
+    }
+    
+    @IBAction private func noButtonClicked(_ sender: UIButton) {
+        showAnswerResult(isCorrect: questions[currentQuestionIndex].correctAnswer == false)
+        imageView.layer.borderColor = UIColor.ypRed.cgColor
+    }
+    
 }
 
 /*
