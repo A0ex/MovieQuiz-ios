@@ -116,9 +116,6 @@ final class MovieQuizViewController: UIViewController {
     private func showAnswerResult(isCorrect: Bool) {
         yesButton.isEnabled = false
         noButton.isEnabled = false
-        // Сохранение текущих значений свойств рамки
-        let currentMasksToBounds = imageView.layer.masksToBounds
-        let currentCornerRadius = imageView.layer.cornerRadius
 
         // Установка рамки
         imageView.layer.masksToBounds = true
@@ -126,14 +123,10 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         imageView.layer.cornerRadius = 20
         correctAnswers += isCorrect ? 1 : 0
+        
+        
         // Убирание рамки через секунду
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            // Восстановление предыдущих значений свойств рамки
-            self.imageView.layer.masksToBounds = currentMasksToBounds
-//            self.imageView.layer.borderWidth = currentBorderWidth
-            self.imageView.layer.borderColor = UIColor.ypBlack.cgColor
-            self.imageView.layer.cornerRadius = currentCornerRadius
-
             // Переход к следующему вопросу или результатам
             self.showNextQuestionOrResults()
         }
