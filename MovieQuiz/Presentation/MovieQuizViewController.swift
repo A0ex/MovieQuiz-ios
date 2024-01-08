@@ -85,6 +85,9 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
     
+    @IBOutlet var yesButton: UIButton!
+    @IBOutlet var noButton: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         let currentQuestion = questions[currentQuestionIndex]
@@ -111,10 +114,10 @@ final class MovieQuizViewController: UIViewController {
 //        }
 //    }
     private func showAnswerResult(isCorrect: Bool) {
+        yesButton.isEnabled = false
+        noButton.isEnabled = false
         // Сохранение текущих значений свойств рамки
         let currentMasksToBounds = imageView.layer.masksToBounds
-        let currentBorderWidth = imageView.layer.borderWidth
-        let currentBorderColor = imageView.layer.borderColor
         let currentCornerRadius = imageView.layer.cornerRadius
 
         // Установка рамки
@@ -145,6 +148,8 @@ final class MovieQuizViewController: UIViewController {
             let nextQuestion = questions[currentQuestionIndex]
             show(quiz: convert(model: nextQuestion))
         }
+        yesButton.isEnabled = true
+        noButton.isEnabled = true
     }
     
     private func show(quiz step: QuizStepViewModel) {
