@@ -32,11 +32,12 @@ final class MovieQuizViewController: UIViewController {
         // булевое значение (true, false), правильный ответ на вопрос
         let correctAnswer: Bool
     }
-    
+
     
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
     
+    private let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
     private let questions: [QuizQuestion] = [
             QuizQuestion(
                 image: "The Godfather",
@@ -97,28 +98,102 @@ final class MovieQuizViewController: UIViewController {
     
     // приватный метод, который меняет цвет рамки
     // принимает на вход булевое значение и ничего не возвращает
+//    private func showAnswerResult(isCorrect: Bool) {
+//       // метод красит рамку
+//        imageView.layer.masksToBounds = true // даём разрешение на рисование рамки
+//        imageView.layer.borderWidth = 8 // толщина рамки
+//        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor // делаем рамку белой
+//        imageView.layer.cornerRadius = 20 // радиус скругления углов рамки
+//        correctAnswers += isCorrect ? 1 : 0
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+//        
+//            self.showNextQuestionOrResults()
+//        }
+//    }
     private func showAnswerResult(isCorrect: Bool) {
-       // метод красит рамку
-        imageView.layer.masksToBounds = true // даём разрешение на рисование рамки
-        imageView.layer.borderWidth = 1 // толщина рамки
-        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor // делаем рамку белой
-        imageView.layer.cornerRadius = 6 // радиус скругления углов рамки
+        // Сохранение текущих значений свойств рамки
+        let currentMasksToBounds = imageView.layer.masksToBounds
+        let currentBorderWidth = imageView.layer.borderWidth
+        let currentBorderColor = imageView.layer.borderColor
+        let currentCornerRadius = imageView.layer.cornerRadius
+
+        // Установка рамки
+        imageView.layer.masksToBounds = true
+        imageView.layer.borderWidth = 8
+        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+        imageView.layer.cornerRadius = 20
+        correctAnswers += isCorrect ? 1 : 0
+        // Убирание рамки через секунду
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            // Восстановление предыдущих значений свойств рамки
+            self.imageView.layer.masksToBounds = currentMasksToBounds
+//            self.imageView.layer.borderWidth = currentBorderWidth
+            self.imageView.layer.borderColor = UIColor.ypBlack.cgColor
+            self.imageView.layer.cornerRadius = currentCornerRadius
+
+            // Переход к следующему вопросу или результатам
+            self.showNextQuestionOrResults()
+        }
+    }
+    
+    private func showNextQuestionOrResults() {
+        if currentQuestionIndex == questions.count - 1 {
+            let res = QuizResultsViewModel(title: "Этот раунд окончен!", text: "Ваш результат \(correctAnswers)/10", buttonText: "Сыграть ещё раз")
+            show(quiz: res)
+        } else {
+            currentQuestionIndex += 1
+            let nextQuestion = questions[currentQuestionIndex]
+            show(quiz: convert(model: nextQuestion))
+        }
     }
     
     private func show(quiz step: QuizStepViewModel) {
-        imageView.image = step.image
+        let newImage = step.image
+        // Анимация смены изображения с плавным переходом
+        UIView.transition(with: imageView,
+                          duration: 0.5, // Длительность анимации в секундах
+                          options: .transitionCrossDissolve, // Тип анимации (плавное появление/исчезновение)
+                          animations: {
+                              self.imageView.image = newImage
+            self.imageView.layer.borderWidth = 0
+                          },
+                          completion: nil)
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
     }
+
+    
+    // приватный метод для показа результатов раунда квиза
+    // принимает вью модель QuizResultsViewModel и ничего не возвращает
+    private func show(quiz result: QuizResultsViewModel) {
+        let alert = UIAlertController(title: result.title, // заголовок всплывающего окна
+                                      message: result.text, // текст во всплывающем окне
+                                      preferredStyle: .alert)
+
+        // создаём для алерта кнопку с действием
+        // в замыкании пишем, что должно происходить при нажатии на кнопку
+        let action = UIAlertAction(title: result.buttonText, style: .default) { _ in
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            let currentQuestion = self.questions[self.currentQuestionIndex]
+            self.show(quiz: self.convert(model: currentQuestion))
+        }
+
+        // добавляем в алерт кнопку
+        alert.addAction(action)
+
+        // показываем всплывающее окно
+        self.present(alert, animated: true, completion: nil)
+    }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
+        feedbackGenerator.impactOccurred()
         showAnswerResult(isCorrect: questions[currentQuestionIndex].correctAnswer == true)
-        imageView.layer.borderColor = UIColor.ypGreen.cgColor
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
+        feedbackGenerator.impactOccurred()
         showAnswerResult(isCorrect: questions[currentQuestionIndex].correctAnswer == false)
-        imageView.layer.borderColor = UIColor.ypRed.cgColor
     }
     
 }
