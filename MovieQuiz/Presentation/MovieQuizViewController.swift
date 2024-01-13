@@ -3,7 +3,7 @@ import UIKit
 final class MovieQuizViewController: UIViewController {
     // MARK: - Lifecycle
     
-    struct ViewModel {
+    private struct ViewModel {
         let image: UIImage
         let question: String
         let questionNumber: String
