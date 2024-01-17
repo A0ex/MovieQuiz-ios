@@ -3,12 +3,6 @@ import UIKit
 final class MovieQuizViewController: UIViewController {
     // MARK: - Lifecycle
     
-    private struct ViewModel {
-        let image: UIImage
-        let question: String
-        let questionNumber: String
-    }
-    
     // для состояния "Вопрос показан"
     private struct QuizStepViewModel {
         let image: UIImage
