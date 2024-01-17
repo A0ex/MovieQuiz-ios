@@ -112,8 +112,9 @@ final class MovieQuizViewController: UIViewController {
         
         
         // Убирание рамки через секунду
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             // Переход к следующему вопросу или результатам
+            guard let self = self else { return }
             self.showNextQuestionOrResults()
         }
     }
@@ -137,7 +138,8 @@ final class MovieQuizViewController: UIViewController {
         UIView.transition(with: imageView,
                           duration: 0.5, // Длительность анимации в секундах
                           options: .transitionCrossDissolve, // Тип анимации (плавное появление/исчезновение)
-                          animations: {
+                          animations: { [weak self] in
+            guard let self = self else { return }
             self.imageView.image = newImage
             self.imageView.layer.borderWidth = 0
         },
@@ -156,7 +158,8 @@ final class MovieQuizViewController: UIViewController {
         
         // создаём для алерта кнопку с действием
         // в замыкании пишем, что должно происходить при нажатии на кнопку
-        let action = UIAlertAction(title: result.buttonText, style: .default) { _ in
+        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
+            guard let self = self else { return }
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
             let currentQuestion = self.questions[self.currentQuestionIndex]
