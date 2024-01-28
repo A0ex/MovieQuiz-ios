@@ -22,6 +22,7 @@
 		DB10664C2B5EC1CB0063FFF4 /* QuizQuestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB10664B2B5EC1CB0063FFF4 /* QuizQuestion.swift */; };
 		DBBEA3822B3710A400DF122E /* YS Display-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DBBEA3802B3710A400DF122E /* YS Display-Bold.ttf */; };
 		DBBEA3832B3710A400DF122E /* YS Display-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DBBEA3812B3710A400DF122E /* YS Display-Medium.ttf */; };
+		DBBF56342B640CC000A13F13 /* QuestionFactoryDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBF56332B640CC000A13F13 /* QuestionFactoryDelegate.swift */; };
 		DBDD2C702B5FB600000CF220 /* QuestionFactoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDD2C6F2B5FB600000CF220 /* QuestionFactoryProtocol.swift */; };
 /* End PBXBuildFile section */
 
@@ -43,6 +44,7 @@
 		DB10664B2B5EC1CB0063FFF4 /* QuizQuestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizQuestion.swift; sourceTree = "<group>"; };
 		DBBEA3802B3710A400DF122E /* YS Display-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Bold.ttf"; sourceTree = "<group>"; };
 		DBBEA3812B3710A400DF122E /* YS Display-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Medium.ttf"; sourceTree = "<group>"; };
+		DBBF56332B640CC000A13F13 /* QuestionFactoryDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionFactoryDelegate.swift; sourceTree = "<group>"; };
 		DBDD2C6F2B5FB600000CF220 /* QuestionFactoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionFactoryProtocol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -122,6 +124,7 @@
 			children = (
 				DB1066442B5EB8FC0063FFF4 /* QuestionFactory.swift */,
 				DBDD2C6F2B5FB600000CF220 /* QuestionFactoryProtocol.swift */,
+				DBBF56332B640CC000A13F13 /* QuestionFactoryDelegate.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -222,6 +225,7 @@
 				AD5EE5DE284D7887003966EF /* UIColor+Extensions.swift in Sources */,
 				AD7AFA552836189F00399704 /* Array+Extensions.swift in Sources */,
 				DBDD2C702B5FB600000CF220 /* QuestionFactoryProtocol.swift in Sources */,
+				DBBF56342B640CC000A13F13 /* QuestionFactoryDelegate.swift in Sources */,
 				AD1ABAB62831907B00B3E448 /* MovieQuizViewController.swift in Sources */,
 				DB1066482B5EC1A40063FFF4 /* QuizStepViewModel.swift in Sources */,
 				DB10664C2B5EC1CB0063FFF4 /* QuizQuestion.swift in Sources */,

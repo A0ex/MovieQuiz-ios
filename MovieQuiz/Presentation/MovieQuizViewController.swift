@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Lifecycle
     
     private var currentQuestionIndex = 0
@@ -18,15 +18,30 @@ final class MovieQuizViewController: UIViewController {
     
     @IBOutlet var yesButton: UIButton!
     @IBOutlet var noButton: UIButton!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let firstQuestion = questionFactory.requestNextQuestion() {
-            currentQuestion = firstQuestion
-            let viewModel = convert(model: firstQuestion)
-            show(quiz: viewModel)
-        }
+        questionFactory.delegate = self
+        questionFactory.requestNextQuestion()
     }
+    
+    // MARK: - QuestionFactoryDelegate
+    
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        // проверка, что вопрос не nil
+        guard let question = question else {
+            return
+        }
+        
+        currentQuestion = question
+        let viewModel = convert(model: question)
+        DispatchQueue.main.async { [weak self] in
+            self?.show(quiz: viewModel)
+        }
+        show(quiz: viewModel)
+    }
+    
+    // MARK: - Private Functions
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let viewModel = QuizStepViewModel(image: UIImage(named: model.image) ?? UIImage(), question: model.text, questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
@@ -58,11 +73,8 @@ final class MovieQuizViewController: UIViewController {
             let res = QuizResultsViewModel(title: "Этот раунд окончен!", text: "Ваш результат \(correctAnswers)/10", buttonText: "Сыграть ещё раз")
             show(quiz: res)
         } else {
-            if let nextQuestion = questionFactory.requestNextQuestion() {
-                currentQuestionIndex += 1
-                currentQuestion = nextQuestion
-                show(quiz: convert(model: nextQuestion))
-            }
+            currentQuestionIndex += 1
+            questionFactory.requestNextQuestion()
         }
         yesButton.isEnabled = true
         noButton.isEnabled = true
@@ -96,13 +108,9 @@ final class MovieQuizViewController: UIViewController {
         // в замыкании пишем, что должно происходить при нажатии на кнопку
         let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
             guard let self = self else { return }
-            if let firstQuestion = self.questionFactory.requestNextQuestion() {
-                self.currentQuestion = firstQuestion
-                let viewModel = self.convert(model: firstQuestion)
-                self.currentQuestionIndex = 0
-                self.correctAnswers = 0
-                self.show(quiz: viewModel)
-            }
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            questionFactory.requestNextQuestion()
         }
         
         // добавляем в алерт кнопку
