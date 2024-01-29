@@ -1,12 +1,14 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterDelegate {
+    
     // MARK: - Lifecycle
     
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
     
     private let questionsAmount: Int = 10
+    private var alertPresenter = AlertPresenter()
     private var questionFactory: QuestionFactoryProtocol = QuestionFactory()
     private var currentQuestion: QuizQuestion?
     
@@ -21,6 +23,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        alertPresenter.delegate = self
         questionFactory.delegate = self
         questionFactory.requestNextQuestion()
     }
@@ -38,7 +41,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
-        show(quiz: viewModel)
+    }
+    
+    // MARK: - AlertPresenterDelegate
+    
+    func showAlert(_ alertModel: UIAlertController) {
+        self.present(alertModel, animated: true, completion: nil)
     }
     
     // MARK: - Private Functions
@@ -70,8 +78,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
-            let res = QuizResultsViewModel(title: "Этот раунд окончен!", text: "Ваш результат \(correctAnswers)/10", buttonText: "Сыграть ещё раз")
-            show(quiz: res)
+            var alertModel = AlertModel()
+//            let res = QuizResultsViewModel(title: "Этот раунд окончен!", text: "Ваш результат \(correctAnswers)/10", buttonText: "Сыграть ещё раз")
+            alertModel.message += " \(correctAnswers)/10"
+            alertModel.completion = {
+                self.currentQuestionIndex = 0
+                self.correctAnswers = 0
+                self.questionFactory.requestNextQuestion()
+            }
+//            show(quiz: res)
+            alertPresenter.show(model: alertModel)
         } else {
             currentQuestionIndex += 1
             questionFactory.requestNextQuestion()
@@ -99,26 +115,26 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // приватный метод для показа результатов раунда квиза
     // принимает вью модель QuizResultsViewModel и ничего не возвращает
-    private func show(quiz result: QuizResultsViewModel) {
-        let alert = UIAlertController(title: result.title, // заголовок всплывающего окна
-                                      message: result.text, // текст во всплывающем окне
-                                      preferredStyle: .alert)
-        
-        // создаём для алерта кнопку с действием
-        // в замыкании пишем, что должно происходить при нажатии на кнопку
-        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
-            questionFactory.requestNextQuestion()
-        }
-        
-        // добавляем в алерт кнопку
-        alert.addAction(action)
-        
-        // показываем всплывающее окно
-        self.present(alert, animated: true, completion: nil)
-    }
+//    private func show(quiz result: QuizResultsViewModel) {
+//        let alert = UIAlertController(title: result.title, // заголовок всплывающего окна
+//                                      message: result.text, // текст во всплывающем окне
+//                                      preferredStyle: .alert)
+//        
+//        // создаём для алерта кнопку с действием
+//        // в замыкании пишем, что должно происходить при нажатии на кнопку
+//        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
+//            guard let self = self else { return }
+//            self.currentQuestionIndex = 0
+//            self.correctAnswers = 0
+//            questionFactory.requestNextQuestion()
+//        }
+//        
+//        // добавляем в алерт кнопку
+//        alert.addAction(action)
+//        
+//        // показываем всплывающее окно
+//        self.present(alert, animated: true, completion: nil)
+//    }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         feedbackGenerator.impactOccurred()
@@ -133,6 +149,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
 }
+
 
 /*
  Mock-данные
