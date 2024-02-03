@@ -112,30 +112,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         counterLabel.text = step.questionNumber
     }
     
-    
-    // приватный метод для показа результатов раунда квиза
-    // принимает вью модель QuizResultsViewModel и ничего не возвращает
-//    private func show(quiz result: QuizResultsViewModel) {
-//        let alert = UIAlertController(title: result.title, // заголовок всплывающего окна
-//                                      message: result.text, // текст во всплывающем окне
-//                                      preferredStyle: .alert)
-//        
-//        // создаём для алерта кнопку с действием
-//        // в замыкании пишем, что должно происходить при нажатии на кнопку
-//        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
-//            guard let self = self else { return }
-//            self.currentQuestionIndex = 0
-//            self.correctAnswers = 0
-//            questionFactory.requestNextQuestion()
-//        }
-//        
-//        // добавляем в алерт кнопку
-//        alert.addAction(action)
-//        
-//        // показываем всплывающее окно
-//        self.present(alert, animated: true, completion: nil)
-//    }
-    
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         feedbackGenerator.impactOccurred()
         guard let currentQuestion = currentQuestion else { return }
