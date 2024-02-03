@@ -8,9 +8,10 @@
 import Foundation
 
 protocol StatisticService {
-    var totalAccuracy: Double { get }
-    var gamesCount: Int { get }
-    var bestGame: GameRecord { get }
+    var totalAccuracy: Double { get } // средняя точность
+    var allCorrectAnswers: Int { get }
+    var gamesCount: Int { get } // количество завершенных игр
+    var bestGame: GameRecord { get } // информация о лучшей попытке
     func store(correct count: Int, total amount: Int)
 }
 
@@ -22,6 +23,10 @@ struct GameRecord: Codable {
     // метод сравнения по количеству верных ответов
     func isBetterThan(_ another: GameRecord) -> Bool {
         correct > another.correct
+    }
+    
+    func showRecord() -> String {
+        return "\(correct)/\(total) (\(date.dateTimeString))"
     }
 }
 

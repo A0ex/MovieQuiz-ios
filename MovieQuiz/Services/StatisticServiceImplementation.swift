@@ -8,11 +8,21 @@
 import UIKit
 
 final class StatisticServiceImplementation: StatisticService {
-    
+
     private let userDefaults = UserDefaults.standard
     
     private enum Keys: String {
         case correct, total, bestGame, gamesCount
+    }
+    
+    var allCorrectAnswers: Int {
+        get {
+            let data = userDefaults.integer(forKey: "allCorrectAnswers")
+            return data
+        }
+        set {
+            userDefaults.set(newValue, forKey: "allCorrectAnswers")
+        }
     }
     
     var totalAccuracy: Double {
@@ -53,7 +63,10 @@ final class StatisticServiceImplementation: StatisticService {
     }
     
     func store(correct count: Int, total amount: Int) {
-        return
+        let newRecord = GameRecord(correct: count, total: amount, date: NSDate() as Date)
+        if newRecord.isBetterThan(bestGame) {
+            bestGame = newRecord
+        }
     }
     
     

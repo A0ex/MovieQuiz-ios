@@ -10,6 +10,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     private let questionsAmount: Int = 10
     private var alertPresenter = AlertPresenter()
     private var questionFactory: QuestionFactoryProtocol = QuestionFactory()
+    private var statisticService = StatisticServiceImplementation()
     private var currentQuestion: QuizQuestion?
     
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
@@ -78,9 +79,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
+            statisticService.gamesCount += 1
+            statisticService.allCorrectAnswers += correctAnswers
+            statisticService.store(correct: correctAnswers, total: questionsAmount)
+            statisticService.totalAccuracy = Double(statisticService.allCorrectAnswers) / Double(questionsAmount * statisticService.gamesCount)
             var alertModel = AlertModel()
 //            let res = QuizResultsViewModel(title: "Этот раунд окончен!", text: "Ваш результат \(correctAnswers)/10", buttonText: "Сыграть ещё раз")
-            alertModel.message += " \(correctAnswers)/10"
+            alertModel.message = "Ваш результат: \(correctAnswers)/10\nКоличество сыгранных квизов: \(statisticService.gamesCount)\nРекорд: \(statisticService.bestGame.showRecord())\nСредняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
             alertModel.completion = {
                 self.currentQuestionIndex = 0
                 self.correctAnswers = 0
