@@ -63,7 +63,7 @@ final class StatisticServiceImplementation: StatisticService {
     }
     
     func store(correct count: Int, total amount: Int) {
-        let newRecord = GameRecord(correct: count, total: amount, date: NSDate() as Date)
+        let newRecord = GameRecord(correct: count, total: amount, date: Date())
         if newRecord.isBetterThan(bestGame) {
             bestGame = newRecord
         }
