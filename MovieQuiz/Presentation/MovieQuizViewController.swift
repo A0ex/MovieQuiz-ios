@@ -82,7 +82,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         alertModel.message = message
         alertModel.buttonText = "Попробовать ещё раз"
         alertModel.completion = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
             self.questionFactory?.loadData()
