@@ -8,8 +8,8 @@
 import Foundation
 
 struct AlertModel {
-    let title = "Этот раунд окончен!"
+    var title = "Этот раунд окончен!"
     var message = "Ваш результат:"
-    let buttonText = "Сыграть ещё раз"
+    var buttonText = "Сыграть ещё раз"
     var completion: (() -> Void)?
 }
