@@ -8,8 +8,11 @@
 import UIKit
 
 final class MovieQuizPresenter {
-    let questionsAmount: Int = 10
+    private let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
     private var currentQuestionIndex: Int = 0
+    var currentQuestion: QuizQuestion?
+    weak var viewController: MovieQuizViewController?
+    let questionsAmount: Int = 10
     
     func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
@@ -29,5 +32,17 @@ final class MovieQuizPresenter {
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
         return viewModel
+    }
+    
+    func yesButtonClicked() {
+        feedbackGenerator.impactOccurred()
+        guard let currentQuestion = currentQuestion else { return }
+        viewController?.showAnswerResult(isCorrect: currentQuestion.correctAnswer == true)
+    }
+    
+    func noButtonClicked() {
+        feedbackGenerator.impactOccurred()
+        guard let currentQuestion = currentQuestion else { return }
+        viewController?.showAnswerResult(isCorrect: currentQuestion.correctAnswer == false)
     }
 }
