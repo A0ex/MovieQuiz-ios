@@ -14,6 +14,7 @@ final class AlertPresenter {
         let alert = UIAlertController(title: model.title, // заголовок всплывающего окна
                                       message: model.message, // текст во всплывающем окне
                                       preferredStyle: .alert)
+        alert.view.accessibilityIdentifier = "Game results"
         let action = UIAlertAction(title: model.buttonText, style: .default, handler: { _ in
             model.completion?()
         })

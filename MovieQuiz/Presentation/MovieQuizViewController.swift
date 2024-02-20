@@ -4,15 +4,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     // MARK: - Lifecycle
     
-    private var currentQuestionIndex = 0
     private var correctAnswers = 0
     
-    private let questionsAmount: Int = 10
     private var alertPresenter = AlertPresenter()
     private var questionFactory: QuestionFactoryProtocol?
     private var statisticService = StatisticServiceImplementation()
     private var currentQuestion: QuizQuestion?
     
+    private let presenter = MovieQuizPresenter()
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
     
     @IBOutlet private var imageView: UIImageView!
@@ -42,7 +41,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         }
         
         currentQuestion = question
-        let viewModel = convert(model: question)
+        let viewModel = presenter.convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
@@ -83,19 +82,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         alertModel.buttonText = "Попробовать ещё раз"
         alertModel.completion = { [weak self] in
             guard let self else { return }
-            self.currentQuestionIndex = 0
             self.correctAnswers = 0
+            presenter.resetQuestionIndex()
             self.questionFactory?.loadData()
         }
         alertPresenter.show(model: alertModel)
-    }
-    
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let viewModel = QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-        return viewModel
     }
     
     private func showAnswerResult(isCorrect: Bool) {
@@ -119,21 +110,21 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     private func showNextQuestionOrResults() {
-        if currentQuestionIndex == questionsAmount - 1 {
+        if presenter.isLastQuestion() {
             statisticService.gamesCount += 1
             statisticService.allCorrectAnswers += correctAnswers
-            statisticService.store(correct: correctAnswers, total: questionsAmount)
-            statisticService.totalAccuracy = 100 * Double(statisticService.allCorrectAnswers) / Double(questionsAmount * statisticService.gamesCount)
+            statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
+            statisticService.totalAccuracy = 100 * Double(statisticService.allCorrectAnswers) / Double(presenter.questionsAmount * statisticService.gamesCount)
             var alertModel = AlertModel()
             alertModel.message = "Ваш результат: \(correctAnswers)/10\nКоличество сыгранных квизов: \(statisticService.gamesCount)\nРекорд: \(statisticService.bestGame.showRecord())\nСредняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
             alertModel.completion = { [weak self] in
-                self?.currentQuestionIndex = 0
+                self?.presenter.resetQuestionIndex()
                 self?.correctAnswers = 0
                 self?.questionFactory?.requestNextQuestion()
             }
             alertPresenter.show(model: alertModel)
         } else {
-            currentQuestionIndex += 1
+            presenter.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }
         yesButton.isEnabled = true
