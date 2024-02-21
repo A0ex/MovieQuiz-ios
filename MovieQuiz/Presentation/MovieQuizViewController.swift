@@ -8,7 +8,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     private var alertPresenter = AlertPresenter()
     private var questionFactory: QuestionFactoryProtocol?
-    private var statisticService = StatisticServiceImplementation()
+    private var statisticService: StatisticService?
     
     private let presenter = MovieQuizPresenter()
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
@@ -102,16 +102,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     private func showNextQuestionOrResults() {
         if presenter.isLastQuestion() {
-            statisticService.allCorrectAnswers += correctAnswers
-            statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
-            var alertModel = AlertModel()
-            alertModel.message = "Ваш результат: \(correctAnswers)/10\nКоличество сыгранных квизов: \(statisticService.gamesCount)\nРекорд: \(statisticService.bestGame.showRecord())\nСредняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
-            alertModel.completion = { [weak self] in
-                self?.presenter.resetQuestionIndex()
-                self?.correctAnswers = 0
-                self?.questionFactory?.requestNextQuestion()
-            }
-            alertPresenter.show(model: alertModel)
+            let text = "Вы ответили на \(correctAnswers) из 10, попробуйте еще раз!"
+
+            let viewModel = QuizResultsViewModel(
+                title: "Этот раунд окончен!",
+                text: text,
+                buttonText: "Сыграть ещё раз")
+            show(quiz: viewModel)
         } else {
             presenter.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
@@ -121,19 +118,43 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     func show(quiz step: QuizStepViewModel) {
-        let newImage = step.image
-        // Анимация смены изображения с плавным переходом
-        UIView.transition(with: imageView,
-                          duration: 0.5, // Длительность анимации в секундах
-                          options: .transitionCrossDissolve, // Тип анимации (плавное появление/исчезновение)
-                          animations: { [weak self] in
-            guard let self = self else { return }
-            self.imageView.image = newImage
-            self.imageView.layer.borderWidth = 0
-        },
-                          completion: nil)
+        imageView.layer.borderColor = UIColor.clear.cgColor
+        imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
+        
+    }
+
+    private func show(quiz result: QuizResultsViewModel) {
+        var message = result.text
+        if let statisticService = statisticService {
+            statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
+
+            let bestGame = statisticService.bestGame
+
+            let totalPlaysCountLine = "Количество сыгранных квизов: \(statisticService.gamesCount)"
+            let currentGameResultLine = "Ваш результат: \(correctAnswers)\\\(presenter.questionsAmount)"
+            let bestGameInfoLine = "Рекорд: \(bestGame.correct)\\\(bestGame.total)"
+            + " (\(bestGame.date.dateTimeString))"
+            let averageAccuracyLine = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
+
+            let resultMessage = [
+                currentGameResultLine, totalPlaysCountLine, bestGameInfoLine, averageAccuracyLine
+            ].joined(separator: "\n")
+
+            message = resultMessage
+        }
+
+        let model = AlertModel(title: result.title, message: message, buttonText: result.buttonText) { [weak self] in
+            guard let self = self else { return }
+
+            presenter.resetQuestionIndex()
+            self.correctAnswers = 0
+
+            self.questionFactory?.requestNextQuestion()
+        }
+
+        alertPresenter.show(model: model)
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
