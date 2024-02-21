@@ -1,13 +1,8 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, AlertPresenterDelegate {
-    
-    // MARK: - Lifecycle
-    
-    private var alertPresenter = AlertPresenter()
+final class MovieQuizViewController: UIViewController {
     
     private var presenter: MovieQuizPresenter!
-    private let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
     
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
@@ -17,21 +12,13 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate {
     @IBOutlet var yesButton: UIButton!
     @IBOutlet var noButton: UIButton!
     
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter = MovieQuizPresenter(viewController: self)
-        alertPresenter.delegate = self
         showLoadingIndicator()
     }
-    
-    
-    // MARK: - AlertPresenterDelegate
-    
-    func showAlert(_ alertModel: UIAlertController) {
-        self.present(alertModel, animated: true, completion: nil)
-    }
-    
-    // MARK: - Private Functions
     
     func showLoadingIndicator() {
         activityIndicator.isHidden = false
@@ -44,18 +31,22 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate {
     }
     
     func showNetworkError(message: String) {
-        hideLoadingIndicator()
-        var alertModel = AlertModel()
-        alertModel.title = "Ошибка"
-        alertModel.message = message
-        alertModel.buttonText = "Попробовать ещё раз"
-        alertModel.completion = { [weak self] in
-            guard let self else { return }
-            self.presenter.restartGame()
-        }
-        alertPresenter.show(model: alertModel)
-    }
+            hideLoadingIndicator()
 
+            let alert = UIAlertController(
+                title: "Ошибка",
+                message: message,
+                preferredStyle: .alert)
+
+                let action = UIAlertAction(title: "Попробовать ещё раз",
+                style: .default) { [weak self] _ in
+                    guard let self = self else { return }
+
+                    self.presenter.restartGame()
+                }
+
+            alert.addAction(action)
+        }
     
     func highlightImageBorder(isCorrectAnswer: Bool) {
         yesButton.isEnabled = false
@@ -95,6 +86,7 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate {
         self.present(alert, animated: true, completion: nil)
     }
     
+    // MARK: - Actions
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         presenter.yesButtonClicked()

@@ -9,13 +9,16 @@ import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     private let statisticService: StatisticService!
+    
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
     private var currentQuestionIndex: Int = 0
-    var questionFactory: QuestionFactoryProtocol?
-    var currentQuestion: QuizQuestion?
-    var correctAnswers: Int = 0
     private weak var viewController: MovieQuizViewController?
-    let questionsAmount: Int = 10
+    
+    private let questionsAmount: Int = 10
+    
+    private var questionFactory: QuestionFactoryProtocol?
+    private var currentQuestion: QuizQuestion?
+    private var correctAnswers: Int = 0
     
     init(viewController: MovieQuizViewController) {
         self.viewController = viewController
