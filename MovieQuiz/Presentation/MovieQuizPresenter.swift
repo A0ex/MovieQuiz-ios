@@ -97,4 +97,14 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         viewController?.yesButton.isEnabled = true
         viewController?.noButton.isEnabled = true
     }
+    
+    func restartGame() {
+        currentQuestionIndex = 0
+        correctAnswers = 0
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didAnswer(isCorrect: Bool) {
+        correctAnswers += isCorrect ? 1 : 0
+    }
 }
