@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     
     private var presenter: MovieQuizPresenter!
     
@@ -49,8 +49,8 @@ final class MovieQuizViewController: UIViewController {
         }
     
     func highlightImageBorder(isCorrectAnswer: Bool) {
-        yesButton.isEnabled = false
-        noButton.isEnabled = false
+//        yesButton.isEnabled = false
+//        noButton.isEnabled = false
         
         // Установка рамки
         imageView.layer.masksToBounds = true

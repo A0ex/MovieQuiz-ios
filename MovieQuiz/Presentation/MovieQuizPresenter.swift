@@ -12,7 +12,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
     private var currentQuestionIndex: Int = 0
-    private weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewControllerProtocol?
     
     private let questionsAmount: Int = 10
     
@@ -20,7 +20,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var currentQuestion: QuizQuestion?
     private var correctAnswers: Int = 0
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         statisticService = StatisticServiceImplementation()
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
@@ -102,8 +102,8 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             self.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }
-        viewController?.yesButton.isEnabled = true
-        viewController?.noButton.isEnabled = true
+//        viewController?.yesButton.isEnabled = true
+//        viewController?.noButton.isEnabled = true
     }
     
     func restartGame() {
