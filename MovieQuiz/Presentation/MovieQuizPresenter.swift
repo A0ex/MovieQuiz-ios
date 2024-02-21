@@ -14,13 +14,17 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     var questionFactory: QuestionFactoryProtocol?
     var currentQuestion: QuizQuestion?
     var correctAnswers: Int = 0
-    weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewController?
     let questionsAmount: Int = 10
     
     init(viewController: MovieQuizViewController) {
         self.viewController = viewController
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        questionFactory?.loadData()
+        viewController.showLoadingIndicator()
     }
+    
+    // MARK: - QuestionFactoryDelegate
     
     func didLoadDataFromServer() {
         viewController?.hideLoadingIndicator()

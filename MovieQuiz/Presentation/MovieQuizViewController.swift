@@ -1,11 +1,10 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterDelegate {
+final class MovieQuizViewController: UIViewController, AlertPresenterDelegate {
     
     // MARK: - Lifecycle
     
     private var alertPresenter = AlertPresenter()
-    private var questionFactory: QuestionFactoryProtocol?
     private var statisticService: StatisticService?
     
     private var presenter: MovieQuizPresenter!
@@ -23,32 +22,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         super.viewDidLoad()
         presenter = MovieQuizPresenter(viewController: self)
         alertPresenter.delegate = self
-        questionFactory?.delegate = self
-        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         statisticService = StatisticServiceImplementation()
         showLoadingIndicator()
-        questionFactory?.loadData()
     }
     
-    // MARK: - QuestionFactoryDelegate
-    
-    func didReceiveNextQuestion(question: QuizQuestion?) {
-        presenter.didReceiveNextQuestion(question: question)
-    }
     
     // MARK: - AlertPresenterDelegate
     
     func showAlert(_ alertModel: UIAlertController) {
         self.present(alertModel, animated: true, completion: nil)
-    }
-    
-    func didLoadDataFromServer() {
-        activityIndicator.isHidden = true // скрываем индикатор загрузки
-        questionFactory?.requestNextQuestion()
-    }
-
-    func didFailToLoadData(with error: Error) {
-        showNetworkError(message: error.localizedDescription) // в качестве сообщения используется описание ошибки
     }
     
     // MARK: - Private Functions
@@ -72,7 +54,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         alertModel.completion = { [weak self] in
             guard let self else { return }
             self.presenter.restartGame()
-            self.questionFactory?.loadData()
         }
         alertPresenter.show(model: alertModel)
     }
@@ -93,7 +74,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             // Переход к следующему вопросу или результатам
             guard let self = self else { return }
-            self.presenter.questionFactory = self.questionFactory
             self.presenter.showNextQuestionOrResults()
         }
     }
@@ -128,10 +108,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
 
         let model = AlertModel(title: result.title, message: message, buttonText: result.buttonText) { [weak self] in
             guard let self = self else { return }
-
             self.presenter.restartGame()
-
-            self.questionFactory?.requestNextQuestion()
         }
 
         alertPresenter.show(model: model)
