@@ -102,10 +102,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     private func showNextQuestionOrResults() {
         if presenter.isLastQuestion() {
-            statisticService.gamesCount += 1
             statisticService.allCorrectAnswers += correctAnswers
             statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
-            statisticService.totalAccuracy = 100 * Double(statisticService.allCorrectAnswers) / Double(presenter.questionsAmount * statisticService.gamesCount)
             var alertModel = AlertModel()
             alertModel.message = "Ваш результат: \(correctAnswers)/10\nКоличество сыгранных квизов: \(statisticService.gamesCount)\nРекорд: \(statisticService.bestGame.showRecord())\nСредняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
             alertModel.completion = { [weak self] in
