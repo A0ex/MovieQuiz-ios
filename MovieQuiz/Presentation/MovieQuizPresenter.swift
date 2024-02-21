@@ -34,15 +34,19 @@ final class MovieQuizPresenter {
         return viewModel
     }
     
-    func yesButtonClicked() {
+    private func didAnswer(isYes: Bool) {
         feedbackGenerator.impactOccurred()
-        guard let currentQuestion = currentQuestion else { return }
-        viewController?.showAnswerResult(isCorrect: currentQuestion.correctAnswer == true)
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        viewController?.showAnswerResult(isCorrect: currentQuestion.correctAnswer == isYes)
+    }
+    
+    func yesButtonClicked() {
+        didAnswer(isYes: true)
     }
     
     func noButtonClicked() {
-        feedbackGenerator.impactOccurred()
-        guard let currentQuestion = currentQuestion else { return }
-        viewController?.showAnswerResult(isCorrect: currentQuestion.correctAnswer == false)
+        didAnswer(isYes: false)
     }
 }
