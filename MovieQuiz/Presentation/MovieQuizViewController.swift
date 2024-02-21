@@ -5,7 +5,6 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate {
     // MARK: - Lifecycle
     
     private var alertPresenter = AlertPresenter()
-    private var statisticService: StatisticService?
     
     private var presenter: MovieQuizPresenter!
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
@@ -22,7 +21,6 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate {
         super.viewDidLoad()
         presenter = MovieQuizPresenter(viewController: self)
         alertPresenter.delegate = self
-        statisticService = StatisticServiceImplementation()
         showLoadingIndicator()
     }
     
@@ -85,33 +83,24 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate {
         counterLabel.text = step.questionNumber
         
     }
-
+    
     func show(quiz result: QuizResultsViewModel) {
-        var message = result.text
-        if let statisticService = statisticService {
-            statisticService.store(correct: presenter.correctAnswers, total: presenter.questionsAmount)
-
-            let bestGame = statisticService.bestGame
-
-            let totalPlaysCountLine = "Количество сыгранных квизов: \(statisticService.gamesCount)"
-            let currentGameResultLine = "Ваш результат: \(presenter.correctAnswers)\\\(presenter.questionsAmount)"
-            let bestGameInfoLine = "Рекорд: \(bestGame.correct)\\\(bestGame.total)"
-            + " (\(bestGame.date.dateTimeString))"
-            let averageAccuracyLine = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
-
-            let resultMessage = [
-                currentGameResultLine, totalPlaysCountLine, bestGameInfoLine, averageAccuracyLine
-            ].joined(separator: "\n")
-
-            message = resultMessage
-        }
-
-        let model = AlertModel(title: result.title, message: message, buttonText: result.buttonText) { [weak self] in
+        let message = presenter.makeResultsMessage()
+        
+        let alert = UIAlertController(
+            title: result.title,
+            message: message,
+            preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
             guard let self = self else { return }
+            
             self.presenter.restartGame()
         }
-
-        alertPresenter.show(model: model)
+        
+        alert.addAction(action)
+        
+        self.present(alert, animated: true, completion: nil)
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
